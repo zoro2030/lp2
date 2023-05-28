@@ -1,0 +1,91 @@
+import java.util.*;
+
+public class Graph {
+    //Adjecency list created
+    private LinkedList<Integer> adjecency[]; 
+    //constructor to initialised adjecency list
+    public Graph(int v){
+        adjecency = new LinkedList[v];
+        for(int i = 0 ; i < v ; i++){
+            adjecency[i] = new LinkedList<>();
+        }
+    }
+    //inserting source and destination edges
+    public void insert(int s, int d){
+        adjecency[s].add(d);
+        adjecency[d].add(s);
+    }
+
+    //BFS Function
+    public void bfs(int s){
+        boolean visited_array[] = new boolean[adjecency.length]; // array for visisted node
+        Queue<Integer> q = new LinkedList<Integer>(); //creating queue 
+        q.add(s); // adding source to queue
+        visited_array[s] = true;
+        System.out.print("The BFS traversal is :");
+        while(!q.isEmpty()){   // empting queue
+            int p = q.poll();
+            System.out.print(p+" ");
+            for(int i :adjecency[p]){
+                if(visited_array[i] != true){
+                    visited_array[i] = true;
+                    q.add(i);
+                }
+                //bfs(i)
+            }
+        }
+        System.out.println();
+    }
+
+    //DFS Function
+    private void dfs(int s) {
+        boolean visited_array[] = new boolean[adjecency.length]; // array for visisted node
+        Stack<Integer> q = new Stack<Integer>(); //creating queue 
+        q.push(s); // push source to queue
+        visited_array[s] = true;
+        System.out.print("The DFS traversal is :");
+        while(!q.isEmpty()){   // empting queue
+            int p = q.pop();
+            System.out.print(p+" ");
+            for(int i :adjecency[p]){
+                if(visited_array[i] != true){
+                    visited_array[i] = true;
+                    q.push(i);
+                }
+                //bfs(i)
+            }
+        }
+        System.out.println();
+    }
+
+    //Displaying Graph
+    public void display(int v){
+        for(int i = 0 ; i < v ; i++){
+            System.out.println(i+"->"+adjecency[i]);
+        }
+    }
+
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.println("Enter Number of vertices and edges :");
+        int v = input.nextInt();
+        int e = input.nextInt();
+        Graph obj = new Graph(v);
+        for(int i = 0 ; i < e ; i++){
+            System.out.println("Enter edge between sourcr and destination :");
+            int s = input.nextInt();
+            int d = input.nextInt();
+            obj.insert(s,d);
+        }
+        //display th graph 
+        obj.display(v);
+        System.out.print("Enter Source of traversal :");
+        int sou = input.nextInt();
+        //BFS calling
+        obj.bfs(sou);
+        //DFS calling
+        obj.dfs(sou);
+        input.close();
+    }
+}

@@ -1,0 +1,163 @@
+import java.util.*;
+
+class Node implements Comparable<Node> {
+    int x, y; // Coordinates of the node
+    int f, g, h; // Cost values for the A* algorithm
+    Node parent; // Parent node
+
+    public Node(int x, int y) {
+        this.x = x;
+        this.y = y;
+        this.f = 0;
+        this.g = 0;
+        this.h = 0;
+        this.parent = null;
+    }
+
+    @Override
+    public int compareTo(Node other) {
+        return Integer.compare(this.f, other.f);
+    }
+}
+
+public class Astar {
+    // Constants for movement costs (assuming a grid with uniform cost)
+    private static final int MOVEMENT_COST = 1;
+    private static final int DIAGONAL_MOVEMENT_COST = 1;
+
+    private static final int[][] DIRECTIONS = {
+            { 0, -1 }, // Left
+            { 0, 1 }, // Right
+            { -1, 0 }, // Up
+            { 1, 0 }, // Down
+            { -1, -1 }, // Top left
+            { -1, 1 }, // Top right
+            { 1, -1 }, // Bottom left
+            { 1, 1 } // Bottom right
+    };
+
+    public static List<Node> findPath(int[][] grid, Node start, Node goal) {
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        // Create the open and closed sets
+        List<Node> openSet = new LinkedList<>();
+        Set<Node> closedSet = new HashSet<>();
+
+        // Add the start node to the open set
+        openSet.add(start);
+
+        while (!openSet.isEmpty()) {
+            // Get the node with the lowest f value from the open set
+            Node current = Collections.min(openSet);
+
+            // Remove the current node from the open set
+            openSet.remove(current);
+
+            // Add the current node to the closed set
+            closedSet.add(current);
+
+            // If the current node is the goal, reconstruct the path and return it
+            if (current.x == goal.x && current.y == goal.y) {
+                return reconstructPath(current);
+            }
+
+            // Explore the neighboring nodes
+            for (int[] direction : DIRECTIONS) {
+                int newX = current.x + direction[0];
+                int newY = current.y + direction[1];
+
+                // Check if the new coordinates are within the grid bounds
+                if (newX < 0 || newX >= rows || newY < 0 || newY >= cols) {
+                    continue;
+                }
+
+                // Check if the neighbor is an obstacle (non-traversable)
+                if (grid[newX][newY] == 1) {
+                    continue;
+                }
+
+                // Create a new neighbor node
+                Node neighbor = new Node(newX, newY);
+
+                // Calculate the tentative g value for the neighbor
+                int tentativeG = current.g + getMovementCost(current, neighbor);
+
+                // Skip if the neighbor node has already been evaluated
+                if (closedSet.contains(neighbor)) {
+                    continue;
+                }
+
+                // If the neighbor is not in the open set or the new g value is lower
+                if (!openSet.contains(neighbor) || tentativeG < neighbor.g) {
+                    // Update the g, h, and f values of the neighbor
+                    neighbor.g = tentativeG;
+                    neighbor.h = calculateHeuristic(neighbor, goal);
+                    neighbor.f = neighbor.g + neighbor.h;
+
+                    // Set the current node as the parent of the neighbor
+                    neighbor.parent = current;
+
+                    // Add the neighbor to the open set
+                    openSet.add(neighbor);
+                }
+            }
+        }
+
+        // No path found
+        return null;
+    }
+
+    private static int getMovementCost(Node from, Node to) {
+        int dx = Math.abs(from.x - to.x);
+        int dy = Math.abs(from.y - to.y);
+
+        // Determine if it's diagonal movement
+        if (dx + dy > 1) {
+            return DIAGONAL_MOVEMENT_COST;
+        } else {
+            return MOVEMENT_COST;
+        }
+    }
+
+    private static int calculateHeuristic(Node from, Node to) {
+        int dx = Math.abs(from.x - to.x);
+        int dy = Math.abs(from.y - to.y);
+
+        // Use Manhattan distance as the heuristic
+        return MOVEMENT_COST * (dx + dy);
+    }
+
+    private static List<Node> reconstructPath(Node node) {
+        List<Node> path = new LinkedList<>();
+        while (node != null) {
+            path.add(0, node);
+            node = node.parent;
+        }
+        return path;
+    }
+
+    public static void main(String[] args) {
+        int[][] grid = {
+                { 0, 0, 0, 0, 0 },
+                { 0, 1, 1, 0, 0 },
+                { 0, 0, 0, 0, 0 },
+                { 0, 0, 1, 1, 0 },
+                { 0, 0, 0, 0, 0 }
+        };
+
+        Node start = new Node(0, 0);
+        Node goal = new Node(4, 4);
+
+        List<Node> path = findPath(grid, start, goal);
+
+        if (path != null) {
+            System.out.println("Path found:");
+            for (Node node : path) {
+                System.out.println("(" + node.x + ", " + node.y + ")");
+            }
+        } else {
+            System.out.println("Path not found.");
+        }
+    }
+}

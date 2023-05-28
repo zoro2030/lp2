@@ -1,0 +1,47 @@
+import java.util.*;
+
+public class Selection_sort{
+
+    public static void main(String args[]){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter Size of array :");
+        int size = sc.nextInt();
+        int arr[] = new int[size];
+        
+        System.out.println("Enter Array element :");
+        for(int i = 0 ; i < size ; i++){
+            arr[i] = sc.nextInt();
+        }
+
+        Selection_sort obj = new Selection_sort();
+        obj.sort(arr,size);
+        
+        for(int i = 0; i < size  ; i++){
+            System.out.print(arr[i]+" ");
+        }
+        System.out.println();
+        sc.close();
+    }
+
+    //secting optimal element and swaping it
+    private void sort(int[] arr, int size) {
+        for(int i = 0 ; i < size - 1 ; i++){
+            int min = i;
+            for(int j = i+1 ; j < size  ; j++){
+                if(arr[j] < arr[min]){
+                    min = j;        //optimal element in unsorted array is selected
+                }
+            }  
+            if(min != i){
+                swap(arr, i, min);
+            }
+        }
+    }
+
+    private void swap(int[] arr, int j, int i) {
+        int temp = 0;
+        temp = arr[j];
+        arr[j] = arr[i];
+        arr[i] = temp; 
+    }
+}

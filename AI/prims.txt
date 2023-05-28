@@ -1,0 +1,65 @@
+import java.util.Arrays;
+
+public class PrimMST {
+    private static final int V = 6; // Number of vertices
+
+    private static int selectMinVertex(int[] value, boolean[] setMST) {
+        int minimum = Integer.MAX_VALUE;
+        int vertex = -1;
+        for (int i = 0; i < V; ++i) {
+            if (!setMST[i] && value[i] < minimum) {
+                vertex = i;
+                minimum = value[i];
+            }
+        }
+        return vertex;
+    }
+
+    private static void findMST(int[][] graph) {
+        int[] parent = new int[V]; // Stores MST
+        int[] value = new int[V]; // Used for edge relaxation
+        boolean[] setMST = new boolean[V]; // true -> Vertex is included in MST
+
+        // Assuming start point as Node-0
+        parent[0] = -1; // Start node has no parent
+        value[0] = 0; // Start node has value=0 to get picked first
+
+        // Form MST with (V-1) edges
+        for (int i = 0; i < V - 1; ++i) {
+            // Select the best Vertex by applying the greedy method
+            int u = selectMinVertex(value, setMST);
+            setMST[u] = true; // Include new Vertex in MST
+
+            // Relax adjacent vertices (not yet included in MST)
+            for (int v = 0; v < V; ++v) {
+                /* 3 constraints to relax:
+                    1. Edge is present from u to v.
+                    2. Vertex v is not included in MST.
+                    3. Edge weight is smaller than the current edge weight.
+                */
+                if (graph[u][v] != 0 && !setMST[v] && graph[u][v] < value[v]) {
+                    value[v] = graph[u][v];
+                    parent[v] = u;
+                }
+            }
+        }
+
+        // Print MST
+        for (int i = 1; i < V; ++i) {
+            System.out.println("U->V: " + parent[i] + "->" + i + "  wt = " + graph[parent[i]][i]);
+        }
+    }
+
+    public static void main(String[] args) {
+        int[][] graph = {
+                {0, 4, 6, 0, 0, 0},
+                {4, 0, 6, 3, 4, 0},
+                {6, 6, 0, 1, 8, 0},
+                {0, 3, 1, 0, 2, 3},
+                {0, 4, 8, 2, 0, 7},
+                {0, 0, 0, 3, 7, 0}
+        };
+
+        findMST(graph);
+    }
+}
