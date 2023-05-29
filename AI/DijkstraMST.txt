@@ -1,0 +1,74 @@
+import java.util.*;
+
+class DijkstraMST {
+    static final int V = 5; // Number of vertices in the graph
+
+    // Function to find the vertex with the minimum distance value
+    static int minDistance(int dist[], boolean mstSet[]) {
+        int min = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int v = 0; v < V; v++) {
+            if (!mstSet[v] && dist[v] < min) {
+                min = dist[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+
+    // Function to print the MST
+    static void printMST(int parent[], int graph[][]) {
+        System.out.println("Edge \tWeight");
+        for (int i = 1; i < V; i++) {
+            System.out.println(parent[i] + " - " + i + "\t" + graph[i][parent[i]]);
+        }
+    }
+
+    // Function to implement Dijkstra's algorithm for MST
+    static void dijkstraMST(int graph[][]) {
+        int parent[] = new int[V]; // Array to store constructed MST
+        int dist[] = new int[V]; // Array to hold the minimum distance values
+        boolean mstSet[] = new boolean[V]; // Array to track vertices included in MST
+
+        // Initialize all distances as INFINITE and mstSet[] as false
+        for (int i = 0; i < V; i++) {
+            dist[i] = Integer.MAX_VALUE;
+            mstSet[i] = false;
+        }
+
+        // Start with the first vertex as the source
+        dist[0] = 0;
+        parent[0] = -1;
+
+        // Find MST for all vertices
+        for (int count = 0; count < V - 1; count++) {
+            int u = minDistance(dist, mstSet);
+            mstSet[u] = true;
+
+            // Update distances and parent array of adjacent vertices
+            for (int v = 0; v < V; v++) {
+                if (!mstSet[v] && graph[u][v] != 0 && graph[u][v] < dist[v]) {
+                    parent[v] = u;
+                    dist[v] = graph[u][v];
+                }
+            }
+        }
+
+        // Print the MST
+        printMST(parent, graph);
+    }
+
+    public static void main(String[] args) {
+        int graph[][] = {
+                {0, 2, 0, 6, 0},
+                {2, 0, 3, 8, 5},
+                {0, 3, 0, 0, 7},
+                {6, 8, 0, 0, 9},
+                {0, 5, 7, 9, 0}
+        };
+
+        dijkstraMST(graph);
+    }
+}
